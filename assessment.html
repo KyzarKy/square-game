@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <!-- Put styles here -->
+  <style>
+    .instructions {
+      margin: 10px 0;
+      font-size: 24px;
+      color: gray;
+      text-align: center;
+    }
+    .outer {
+      width: 400px;
+      height: 400px;
+      border: 1px solid black;
+      margin: 0 auto;
+      position: relative;
+    }
+    #inner {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: red;
+      width: 20px;
+      height: 20px;
+    }
+
+  </style>
+
+  <!-- Javascript goes here -->
+  <script>
+    const keyMap = {
+      ArrowUp: 'up',
+      ArrowDown: 'down',
+      ArrowRight: 'right',
+      ArrowLeft: 'left',
+    };
+    const keyDown = {};
+
+    function updatePosition() {
+      const inner = document.getElementById('inner');
+      const style = window.getComputedStyle(inner)// has all CSS key: value pairs for `inner`
+      const {up, down, left, right} = keyDown;
+
+      // update position of inner block
+      // note: an element's style can be updated using:
+      // el.style.key = value
+
+      // KyComment: Get the current right and bottom css values for the square
+      // KyComment: Also get the width/height values of the game board and the square
+      // KyComment: We will use the width/height values to determine game board boundaries
+      const rightPos = parseInt(style.right);
+      const botPos = parseInt(style.bottom);
+      const squareWidth = parseInt(style.width);
+      const squareHeight = parseInt(style.height);
+      const outerStyle = window.getComputedStyle(inner.parentElement);
+      const outerWidth = parseInt(outerStyle.width);
+      const outerHeight = parseInt(outerStyle.height);
+
+      // KyComment: Move the square by animating the bottom and right positions.
+      // KyComment: Only update those positions if the square would still be within boundaries.
+      // KyComment: Increase the vertical/horizontal update values to move faster 
+      // KyComment: (less smooth than changing how often updatePosition is called).
+      const verticalUpdateValue = 1;
+      const horizontalUpdateValue = 1;
+      if (up && botPos < outerHeight - squareHeight) {
+        inner.style.bottom = `${botPos + verticalUpdateValue}px`;
+      }
+      if (down && botPos > 0) {
+        inner.style.bottom = `${botPos - verticalUpdateValue}px`;
+      }
+      if (left && rightPos < outerWidth - squareWidth) {
+        inner.style.right = `${rightPos + horizontalUpdateValue}px`;
+      }
+      if (right && rightPos > 0) {
+        inner.style.right = `${rightPos - horizontalUpdateValue}px`;
+      }
+    }
+
+    function onLoad() {
+      document.addEventListener('keydown', (e) => {keyDown[keyMap[e.key]] = true;})
+      document.addEventListener('keyup', (e) => {keyDown[keyMap[e.key]] = false;})
+
+      window.setInterval(updatePosition, 30); // KyComment: decrease this number to move faster
+    }
+  </script>
+</head>
+<body onload="onLoad()">
+  <!-- Centered, 24px, grey font, 10px top and bottom margin -->
+  <h1 class="instructions">Use the arrow keys to control the block!</h1>
+
+  <!-- Centered, 400px x 400px, solid black 1px border -->
+  <div class="outer">
+
+    <!-- bottom right of the outer div, 20px x 20px, red background -->
+    <div id="inner"></div>
+  </div>
+</body>
+</html>
